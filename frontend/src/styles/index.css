@@ -1,4 +1,4 @@
-/* ===== Base reset ===== */
+/* Base reset */
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; }
 body {
@@ -9,13 +9,13 @@ body {
   padding: 20px;
 }
 
-/* ===== Layout ===== */
+/* Layout */
 .container { max-width: 860px; margin: 0 auto; }
 h1 { margin: 0 0 16px; }
 .muted { opacity: .7; }
 .error { color: #b00020; }
 
-/* ===== Toolbar / Controls ===== */
+/* Toolbar / Controls */
 .toolbar { margin-bottom: 16px; }
 .controls {
   display: flex;
@@ -25,7 +25,7 @@ h1 { margin: 0 0 16px; }
   margin-top: 8px;
 }
 
-/* ===== Search ===== */
+/* Search */
 .search input {
   width: 240px;
   max-width: 100%;
@@ -37,7 +37,7 @@ h1 { margin: 0 0 16px; }
   border-color: #6c8cff;
 }
 
-/* ===== Filter bar ===== */
+/* Filter bar */
 .filter { display: flex; gap: 6px; }
 .filter button {
   padding: 6px 10px;
@@ -51,7 +51,7 @@ h1 { margin: 0 0 16px; }
   background: #eef2ff;
 }
 
-/* ===== Buttons (general) ===== */
+/* Buttons (general) */
 button {
   margin-right: 8px;
   padding: 6px 10px;
@@ -62,7 +62,7 @@ button {
 button:hover { background: #eee; }
 button.danger { border-color: #e57373; }
 
-/* ===== Forms ===== */
+/* Forms */
 .form { margin: 0 0 12px; }
 input, textarea, select {
   display: block;
@@ -76,7 +76,15 @@ input:focus, textarea:focus, select:focus {
   border-color: #6c8cff;
 }
 
-/* ===== Task item ===== */
+/* Labels (bold) */
+.label {
+  display: block;
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+
+/* Task item */
 .task-header { display: flex; align-items: baseline; gap: 8px; }
 .task-meta {
   display: flex;
@@ -87,7 +95,17 @@ input:focus, textarea:focus, select:focus {
 .task-desc { margin-top: 6px; }
 .task-actions { margin-top: 8px; }
 
-/* ===== Carousel (one item at a time) ===== */
+/* Carousel (one item at a time) */
 .carousel { overflow: hidden; }
 .slide { transition: transform .4s ease, opacity .4s ease; }
 .slide.animating { transform: translateX(-8px); opacity: 0; }
+
+/* Sort */
+.sort select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+}
+.sort select:focus {
+  outline: none;
+  border-color: #6c8cff;
+}

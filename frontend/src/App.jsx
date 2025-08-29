@@ -4,11 +4,13 @@ import TaskForm from './components/TaskForm';
 import TaskFilter from './components/TaskFilter';
 import TaskList from './components/TaskList';
 import SearchBox from './components/SearchBox';
+import SortControl from './components/SortControl';
 
 export default function App() {
   const [items, setItems] = useState([]);
-  const [filter, setFilter] = useState('all'); // all | completed | pending
-  const [query, setQuery] = useState('');      // search query
+  const [filter, setFilter] = useState('all');
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState('created_desc'); // new
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
 
@@ -27,9 +29,12 @@ export default function App() {
 
   const visible = useMemo(() => {
     let arr = items;
+
+    // filter
     if (filter === 'completed') arr = arr.filter(t => t.completed);
     else if (filter === 'pending') arr = arr.filter(t => !t.completed);
 
+    // search
     const q = query.trim().toLowerCase();
     if (q) {
       arr = arr.filter(t =>
@@ -37,8 +42,22 @@ export default function App() {
         (t.description || '').toLowerCase().includes(q)
       );
     }
-    return arr;
-  }, [items, filter, query]);
+
+    // sort
+    const pOrder = { high: 3, medium: 2, low: 1 }; // for priority sort
+    const by = {
+      created_desc: (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      created_asc:  (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+      due_asc:      (a, b) => (a.dueDate ? new Date(a.dueDate) : Infinity) - (b.dueDate ? new Date(b.dueDate) : Infinity),
+      due_desc:     (a, b) => (b.dueDate ? new Date(b.dueDate) : -Infinity) - (a.dueDate ? new Date(a.dueDate) : -Infinity),
+      title_asc:    (a, b) => (a.title || '').localeCompare(b.title || ''),
+      title_desc:   (a, b) => (b.title || '').localeCompare(a.title || ''),
+      priority_high:(a, b) => (pOrder[b.priority] || 0) - (pOrder[a.priority] || 0),
+      priority_low: (a, b) => (pOrder[a.priority] || 0) - (pOrder[b.priority] || 0),
+    };
+    const cmp = by[sort] || by.created_desc;
+    return [...arr].sort(cmp);
+  }, [items, filter, query, sort]);
 
   async function handleCreate(data) {
     const created = await createTask(data);
@@ -70,6 +89,7 @@ export default function App() {
         <div className="controls">
           <SearchBox value={query} onChange={setQuery} />
           <TaskFilter value={filter} onChange={setFilter} />
+          <SortControl value={sort} onChange={setSort} />
         </div>
       </div>
 

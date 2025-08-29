@@ -17,26 +17,27 @@ router.get('/', (req, res) => {
 
 // POST create
 router.post('/', validateTask, (req, res) => {
-  const { title, description = '', priority } = req.body;
+  const { title, description = '', priority, dueDate = null } = req.body;
   const task = {
     id: nextId++,
     title,
     description,
     completed: false,
     createdAt: new Date().toISOString(),
-    priority
+    priority,
+    dueDate: dueDate ? new Date(dueDate).toISOString() : null
   };
   tasks.push(task);
   res.status(201).json(task);
 });
 
 // PUT update (full/partial fields allowed)
-router.put('/:id',validateId, (req, res) => {
-  const id = Number(req.params.id);
+router.put('/:id', validateId, (req, res) => {
+  const id = req.taskId;
   const t = tasks.find(x => x.id === id);
   if (!t) return res.status(404).json({ error: 'Task not found' });
 
-  const { title, description, priority, completed } = req.body || {};
+  const { title, description, priority, completed, dueDate } = req.body || {};
 
   if (title !== undefined && (!title || typeof title !== 'string')) {
     return res.status(400).json({ error: 'Invalid "title"' });
@@ -44,15 +45,29 @@ router.put('/:id',validateId, (req, res) => {
   if (priority !== undefined && !priorities.includes(priority)) {
     return res.status(400).json({ error: 'Invalid "priority"' });
   }
+  if (completed !== undefined && typeof completed !== 'boolean') {
+    return res.status(400).json({ error: 'Invalid "completed"' });
+  }
+  if (dueDate !== undefined) {
+    if (dueDate !== null) {
+      const ts = Date.parse(dueDate);
+      if (Number.isNaN(ts)) {
+        return res.status(400).json({ error: 'Invalid "dueDate"' });
+      }
+      t.dueDate = new Date(dueDate).toISOString();
+    } else {
+      t.dueDate = null; // allow clearing due date
+    }
+  }
 
   if (title !== undefined) t.title = title;
   if (description !== undefined) t.description = description;
   if (priority !== undefined) t.priority = priority;
   if (completed !== undefined) {
-  if (typeof completed !== 'boolean') {
-    return res.status(400).json({ error: 'Invalid "completed"' });
-  }
-  t.completed = completed;
+    if (typeof completed !== 'boolean') {
+        return res.status(400).json({ error: 'Invalid "completed"' });
+    }
+    t.completed = completed;
   }
 
   res.json(t);
