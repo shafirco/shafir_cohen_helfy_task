@@ -1,89 +1,74 @@
 const express = require('express');
+const validateTask = require('../middleware/validateTask');
+const validateId = require('../middleware/validateId');
+
 const router = express.Router();
 
-const priorities = ['low','medium','high'];
-let tasks = []; // in-memory array
+// in-memory store (as required)
+const priorities = ['low', 'medium', 'high'];
+let nextId = 1;
+/** @type {Array<{id:number,title:string,description:string,completed:boolean,createdAt:string,priority:'low'|'medium'|'high'}>} */
+const tasks = [];
 
-// GET /api/tasks - return all tasks
+// GET all
 router.get('/', (req, res) => {
   res.json(tasks);
 });
 
-// POST /api/tasks - create new task
-router.post('/', (req, res) => {
-  const { title, description, priority } = req.body;
-  if (!title || !priorities.includes(priority)) {
-    return res.status(400).json({ error: 'Invalid input' });
-  }
-
-  const newTask = {
-    id: Date.now(),
+// POST create
+router.post('/', validateTask, (req, res) => {
+  const { title, description = '', priority } = req.body;
+  const task = {
+    id: nextId++,
     title,
-    description: description ? description.trim() : '',
+    description,
     completed: false,
     createdAt: new Date().toISOString(),
     priority
   };
-
-  tasks.push(newTask);
-  res.status(201).json(newTask);
+  tasks.push(task);
+  res.status(201).json(task);
 });
 
-// PUT /api/tasks/:id - update task
-router.put('/:id', (req, res) => {
-  const id = parseInt(req.params.id, 10);
+// PUT update (full/partial fields allowed)
+router.put('/:id',validateId, (req, res) => {
+  const id = Number(req.params.id);
+  const t = tasks.find(x => x.id === id);
+  if (!t) return res.status(404).json({ error: 'Task not found' });
 
-  // id must be a positive integer
-  if (!Number.isInteger(id) || id <= 0) {
-    return res.status(400).json({ error: 'Invalid id' });
+  const { title, description, priority, completed } = req.body || {};
+
+  if (title !== undefined && (!title || typeof title !== 'string')) {
+    return res.status(400).json({ error: 'Invalid "title"' });
   }
-
-  const task = tasks.find(t => t.id === id);
-  if (!task) return res.status(404).json({ error: 'Task not found' });
-
-  const { title, description, priority, completed } = req.body;
-
   if (priority !== undefined && !priorities.includes(priority)) {
-    return res.status(400).json({ error: 'Invalid input: priority' }); 
+    return res.status(400).json({ error: 'Invalid "priority"' });
   }
 
-  if (title !== undefined && (typeof title !== 'string' || title.trim() === '')) {
-    return res.status(400).json({ error: 'Invalid input: title' }); 
-  }
+  if (title !== undefined) t.title = title;
+  if (description !== undefined) t.description = description;
+  if (priority !== undefined) t.priority = priority;
+  if (completed !== undefined) t.completed = !!completed;
 
-  if (completed !== undefined && typeof completed !== 'boolean') {
-    return res.status(400).json({ error: 'Invalid input: completed' }); 
-  }
-
-  if (title !== undefined) task.title = title.trim();
-  if (description !== undefined) task.description = description;
-  if (priority !== undefined) task.priority = priority;
-  if (completed !== undefined) task.completed = completed;
-
-  return res.status(200).json(task);
+  res.json(t);
 });
 
-
-// DELETE /api/tasks/:id - delete task
-router.delete('/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const index = tasks.findIndex(t => t.id === id);
-  if (index === -1) return res.status(404).json({ error: 'Task not found' });
-
-  tasks.splice(index, 1);
-  res.status(204).send();
+// DELETE
+router.delete('/:id',validateId, (req, res) => {
+  const id = Number(req.params.id);
+  const idx = tasks.findIndex(x => x.id === id);
+  if (idx === -1) return res.status(404).json({ error: 'Task not found' });
+  tasks.splice(idx, 1);
+  res.status(204).end();
 });
 
-// PATCH /api/tasks/:id/toggle - toggle completed
-router.patch('/:id/toggle', (req, res) => {
-  const id = parseInt(req.params.id);
-  const task = tasks.find(t => t.id === id);
-  if (!task) return res.status(404).json({ error: 'Task not found' });
-
-  task.completed = !task.completed;
-  res.json(task);
+// PATCH toggle (required by assignment)
+router.patch('/:id/toggle',validateId, (req, res) => {
+  const id = Number(req.params.id);
+  const t = tasks.find(x => x.id === id);
+  if (!t) return res.status(404).json({ error: 'Task not found' });
+  t.completed = !t.completed;
+  res.json(t);
 });
-
-
 
 module.exports = router;

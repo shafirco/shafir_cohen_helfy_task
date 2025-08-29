@@ -1,0 +1,68 @@
+/* ===== Base reset ===== */
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #ffffff;
+  color: #000000;
+  padding: 20px;
+}
+
+/* ===== Layout ===== */
+.container { max-width: 800px; margin: 0 auto; }
+h1 { margin: 0 0 16px; }
+.muted { opacity: .7; }
+
+/* ===== Lists ===== */
+ul { list-style: none; padding: 0; margin: 0; }
+li { padding: 8px 0; border-bottom: 1px solid #ddd; }
+
+/* ===== Buttons ===== */
+button {
+  margin-right: 8px;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  cursor: pointer;
+}
+button:hover { background: #eee; }
+button.primary { border-color: #6c8cff; }
+button.danger { border-color: #e57373; }
+
+/* ===== Forms ===== */
+.form { margin: 0 0 16px; }
+input, textarea, select {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  padding: 6px;
+  border: 1px solid #ccc;
+}
+
+/* ===== Filter bar ===== */
+.filter { margin: 12px 0; }
+
+/* ===== Task item ===== */
+.task { }
+.task-header { display: flex; align-items: baseline; gap: 8px; }
+.task-title { }
+.task-status { color: #555; }
+.task-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+  color: #555;
+}
+.task-desc { margin-top: 6px; }
+.task-actions { margin-top: 8px; }
+
+/* ===== Carousel (one item at a time) ===== */
+.carousel { overflow: hidden; }
+.slide {
+  transition: transform .4s ease, opacity .4s ease;
+}
+.slide.animating {
+  transform: translateX(-8px);
+  opacity: 0;
+}
