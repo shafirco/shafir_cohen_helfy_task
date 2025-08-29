@@ -7,7 +7,7 @@ const router = express.Router();
 // in-memory store (as required)
 const priorities = ['low', 'medium', 'high'];
 let nextId = 1;
-/** @type {Array<{id:number,title:string,description:string,completed:boolean,createdAt:string,priority:'low'|'medium'|'high'}>} */
+/** @type {Array<{id:number ,title:string ,description:string ,completed:boolean ,createdAt:string ,priority:'low'|'medium'|'high' }>} */
 const tasks = [];
 
 // GET all
@@ -48,7 +48,12 @@ router.put('/:id',validateId, (req, res) => {
   if (title !== undefined) t.title = title;
   if (description !== undefined) t.description = description;
   if (priority !== undefined) t.priority = priority;
-  if (completed !== undefined) t.completed = !!completed;
+  if (completed !== undefined) {
+  if (typeof completed !== 'boolean') {
+    return res.status(400).json({ error: 'Invalid "completed"' });
+  }
+  t.completed = completed;
+  }
 
   res.json(t);
 });

@@ -3,10 +3,12 @@ import { listTasks, createTask, updateTask, deleteTask, toggleTask } from './ser
 import TaskForm from './components/TaskForm';
 import TaskFilter from './components/TaskFilter';
 import TaskList from './components/TaskList';
+import SearchBox from './components/SearchBox';
 
 export default function App() {
   const [items, setItems] = useState([]);
   const [filter, setFilter] = useState('all'); // all | completed | pending
+  const [query, setQuery] = useState('');      // search query
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
 
@@ -23,11 +25,20 @@ export default function App() {
     })();
   }, []);
 
-  const filtered = useMemo(() => {
-    if (filter === 'completed') return items.filter(t => t.completed);
-    if (filter === 'pending') return items.filter(t => !t.completed);
-    return items;
-  }, [items, filter]);
+  const visible = useMemo(() => {
+    let arr = items;
+    if (filter === 'completed') arr = arr.filter(t => t.completed);
+    else if (filter === 'pending') arr = arr.filter(t => !t.completed);
+
+    const q = query.trim().toLowerCase();
+    if (q) {
+      arr = arr.filter(t =>
+        (t.title || '').toLowerCase().includes(q) ||
+        (t.description || '').toLowerCase().includes(q)
+      );
+    }
+    return arr;
+  }, [items, filter, query]);
 
   async function handleCreate(data) {
     const created = await createTask(data);
@@ -48,15 +59,22 @@ export default function App() {
   }
 
   if (loading) return <div className="container">Loading…</div>;
-  if (err) return <div className="container" style={{color:'#b00020'}}>{err}</div>;
+  if (err) return <div className="container error">{err}</div>;
 
   return (
     <div className="container">
       <h1>Task Manager</h1>
-      <TaskForm onCreate={handleCreate} />
-      <TaskFilter value={filter} onChange={setFilter} />
+
+      <div className="toolbar">
+        <TaskForm onCreate={handleCreate} />
+        <div className="controls">
+          <SearchBox value={query} onChange={setQuery} />
+          <TaskFilter value={filter} onChange={setFilter} />
+        </div>
+      </div>
+
       <TaskList
-        items={filtered}
+        items={visible}
         onUpdate={handleUpdate}
         onDelete={handleDelete}
         onToggle={handleToggle}

@@ -10,15 +10,48 @@ body {
 }
 
 /* ===== Layout ===== */
-.container { max-width: 800px; margin: 0 auto; }
+.container { max-width: 860px; margin: 0 auto; }
 h1 { margin: 0 0 16px; }
 .muted { opacity: .7; }
+.error { color: #b00020; }
 
-/* ===== Lists ===== */
-ul { list-style: none; padding: 0; margin: 0; }
-li { padding: 8px 0; border-bottom: 1px solid #ddd; }
+/* ===== Toolbar / Controls ===== */
+.toolbar { margin-bottom: 16px; }
+.controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
 
-/* ===== Buttons ===== */
+/* ===== Search ===== */
+.search input {
+  width: 240px;
+  max-width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+}
+.search input:focus {
+  outline: none;
+  border-color: #6c8cff;
+}
+
+/* ===== Filter bar ===== */
+.filter { display: flex; gap: 6px; }
+.filter button {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  cursor: pointer;
+}
+.filter button:hover { background: #eee; }
+.filter button.active {
+  border-color: #6c8cff;
+  background: #eef2ff;
+}
+
+/* ===== Buttons (general) ===== */
 button {
   margin-right: 8px;
   padding: 6px 10px;
@@ -27,11 +60,10 @@ button {
   cursor: pointer;
 }
 button:hover { background: #eee; }
-button.primary { border-color: #6c8cff; }
 button.danger { border-color: #e57373; }
 
 /* ===== Forms ===== */
-.form { margin: 0 0 16px; }
+.form { margin: 0 0 12px; }
 input, textarea, select {
   display: block;
   width: 100%;
@@ -39,15 +71,13 @@ input, textarea, select {
   padding: 6px;
   border: 1px solid #ccc;
 }
-
-/* ===== Filter bar ===== */
-.filter { margin: 12px 0; }
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #6c8cff;
+}
 
 /* ===== Task item ===== */
-.task { }
 .task-header { display: flex; align-items: baseline; gap: 8px; }
-.task-title { }
-.task-status { color: #555; }
 .task-meta {
   display: flex;
   gap: 12px;
@@ -59,10 +89,5 @@ input, textarea, select {
 
 /* ===== Carousel (one item at a time) ===== */
 .carousel { overflow: hidden; }
-.slide {
-  transition: transform .4s ease, opacity .4s ease;
-}
-.slide.animating {
-  transform: translateX(-8px);
-  opacity: 0;
-}
+.slide { transition: transform .4s ease, opacity .4s ease; }
+.slide.animating { transform: translateX(-8px); opacity: 0; }
